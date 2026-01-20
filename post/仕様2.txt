@@ -1,0 +1,176 @@
+スプレッドシートAPIを使って集計処理を行っていて、仕様変更がありました。
+変更後の仕様は以下の通り。
+「1日」～「31日」までのシートを読み込む。
+C列を現場名、D列を工事名、L列を人工、N列を外注として、データは5行目から入力されている。
+C5～100行までの中にランダムで現場名が入力されている。（未記入のセルも多数ある）
+D5～100行までの中に、対応するC列に現場名が入っていれば工事名が数字で入力されている。（未記入の可能性もある）
+L5～100行までの中に、対応するC列に現場名が入っていれば人工が数字で入力されている。（未記入の可能性もある）
+N5～100行までの中に、対応するC列に現場名が入っていれば外注が文字で入力されている。（未記入の可能性もある）
+「1日」～「31日」までのシートでループし、現場名と工事名と人工、外注を連想配列に格納する。
+現場名が空の場合はループをスキップする。
+現場名、工事名には改行が含まれている場合があるので、改行を削除する。
+「外注」に書き込まれるパターンは以下のように、文字を「、」または「,」で区切ったもの。
+区切り文字で分割した要素数を外注の数として計上する。（要素が空文字の場合は計上しない）
+例1：山田
+例2：山田、谷口、藤田
+例3：山田、谷口,藤田、
+例1の場合は、外注の数を1として連想配列の外注に格納する。
+例2と例3の場合は、外注の数を3として連想配列の外注に格納する。
+「1日」～「31日」までのシートには、同一の現場名および工事名が複数存在し、その場合は人工や外注を足し合わせる。
+連想配列を現場名・工事名をキーにして昇順にソートする。
+「月集計」シートのB列4行目から連想配列の現場名を書き込む。
+「月集計」シートのC列4行目から連想配列の工事名を書き込む。
+「月集計」シートのD列4行目から連想配列の人工を書き込む。
+「月集計」シートのE列4行目から連想配列の外注を書き込む。
+また、人工が0より大きく、外注が0の場合は人工を書き込むが、外注は書き込まず空のままとする。
+逆に、人工が0で外注が0より大きい場合、人工に0を書き込み、外注は集計した数字を書き込む。
+
+この仕様を実現するコードを書いて。
+
+現在のPHPプログラム（抜粋）は以下の通り
+
+// 年フォルダを取得
+$currentYear = "{$year}年";
+$yearFolderId = getFolderId($drive, ROOT_FOLDER_ID, $currentYear);
+
+$month = is_array($month) ? implode('', $month) : $month;
+// 月スプレッドシートを取得
+$currentMonth = "{$year}年{$month}月";
+var_dump($currentMonth);
+$spreadsheetId = getSpreadsheetId($drive, $yearFolderId, $currentMonth);
+if (!is_string($spreadsheetId)) {
+    echo "❌ スプレッドシートIDが取得できませんでした\n";
+    var_dump($spreadsheetId);
+    exit;
+}
+
+// 多次元配列で人工と外注を集計
+$siteData = [];
+
+for ($day = 1; $day <= 31; $day++) {
+    $sheetName = "{$day}日";
+    $range = "{$sheetName}!C5:N104"; // N列まで取得
+    try {
+        $response = $sheets->spreadsheets_values->get($spreadsheetId, $range);
+        $rows = $response->getValues();
+        if (is_array($rows)) {
+            foreach ($rows as $row) {
+                $site = isset($row[0]) ? preg_replace("/\r\n|\r|\n/", '', $row[0]) : '';
+                $manpower = isset($row[9]) ? normalizeManpower($row[9]) : 0;
+                $outsourcingRaw = isset($row[11]) ? $row[11] : '';
+                $outsourcingCount = 0;
+
+                if ($site !== '') {
+                    // 外注数をカウント
+                    $outsourcingRaw = str_replace(["、", ","], ",", $outsourcingRaw);
+                    $outsourcingList = array_filter(array_map('trim', explode(",", $outsourcingRaw)));
+                    $outsourcingCount = count($outsourcingList);
+
+                    // 初期化
+                    if (!isset($siteData[$site])) {
+                        $siteData[$site] = ['manpower' => 0, 'outsourcing' => 0];
+                    }
+
+                    // 加算
+                    $siteData[$site]['manpower'] += $manpower;
+                    $siteData[$site]['outsourcing'] += $outsourcingCount;
+                }
+            }
+        }
+    } catch (Exception $e) {
+        continue;
+    }
+}
+
+// キー（現場名）で昇順にソート
+ksort($siteData);
+
+// 月集計のB4:D300をクリア
+$clearRange = '月集計!B4:D300';
+$emptyRows = [];
+for ($i = 0; $i < 297; $i++) {
+    $emptyRows[] = ['', '', ''];
+}
+$clearBody = new Google_Service_Sheets_ValueRange([
+    'values' => $emptyRows
+]);
+
+$sheets->spreadsheets_values->update(
+    $spreadsheetId,
+    $clearRange,
+    $clearBody,
+    ['valueInputOption' => 'USER_ENTERED']
+);
+
+// 月集計シートに書き込み
+$updateData = [];
+foreach ($siteData as $site => $data) {
+    $manpower = $data['manpower'];
+    $outsourcing = $data['outsourcing'];
+
+    // 両方0ならスキップ
+    if ($manpower == 0 && $outsourcing == 0) {
+        continue;
+    }
+
+    // 書き込みデータ構築
+    $row = [$site, $manpower];
+    $row[] = ($outsourcing > 0) ? $outsourcing : '';
+    $updateData[] = $row;
+}
+
+$body = new Google_Service_Sheets_ValueRange([
+    'values' => $updateData
+]);
+
+$sheets->spreadsheets_values->update(
+    $spreadsheetId,
+    '月集計!B4:D' . (count($updateData) + 3),
+    $body,
+    ['valueInputOption' => 'USER_ENTERED']
+);
+
+echo '集計が完了しました';
+
+// フォルダID取得関数
+function getFolderId($drive, $parentId, $folderName) {
+    $response = $drive->files->listFiles([
+        'q' => "'$parentId' in parents and mimeType='application/vnd.google-apps.folder' and name='$folderName'",
+        'fields' => 'files(id, name)'
+    ]);
+    return $response->files[0]->id ?? null;
+}
+
+// スプレッドシートID取得関数
+function getSpreadsheetId($drive, $parentId, $name) {
+    $name = trim($name);
+    $query = "'$parentId' in parents and mimeType='application/vnd.google-apps.spreadsheet' and name = '$name'";
+    echo "🔍 クエリ: $query\n";
+
+    $response = $drive->files->listFiles([
+        'q' => $query,
+        'fields' => 'files(id, name)'
+    ]);
+
+    $files = $response->getFiles();
+    foreach ($files as $file) {
+        echo "📄 見つかった: " . $file->getName() . "\n";
+    }
+
+    if (is_array($files) && count($files) > 0) {
+        return $files[0]->getId();
+    }
+
+    return null;
+}
+function normalizeManpower($value) {
+    // 全角数字を半角に変換（数字・小数点・マイナス記号など）
+    $value = mb_convert_kana($value, 'a');
+
+    // 数字として認識できるかチェック
+    if (is_numeric($value)) {
+        return floatval($value);
+    } else {
+        return 0;
+    }
+}

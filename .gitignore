@@ -1,0 +1,9 @@
+*.log
+*.bak
+*.tmp
+*.doc
+*.ppt
+*.pdf
+*.DS_Store
+node_modules/
+chatbot/upload.json
