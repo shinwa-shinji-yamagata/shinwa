@@ -151,6 +151,6 @@ for ($row = 3; ; $row++) {
 }
 
 $_SESSION['upload_result'] = "{$inserted} 件の業者を登録しました。";
-sw_log("insert_genba_master.php","sw_gyousya_masterに{$inserted} 件の業者を登録しました。");
+sw_log("insert_gyousya_master.php","sw_gyousya_masterに{$inserted} 件の業者を登録しました。");
 wp_redirect($_SERVER['HTTP_REFERER']);
 exit;
