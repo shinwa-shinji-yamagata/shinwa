@@ -88,9 +88,6 @@ if (!$spreadsheetId) {
 }
 
 $ss_name = '月集計';
-if ($year == 2025 && $month == 10) {
-  $ss_name = '月集計 のコピー';
-}
 $response = $sheetsService->spreadsheets_values->get($spreadsheetId, $ss_name . '!C4:I');
 
 $rows = $response->getValues();
@@ -156,6 +153,7 @@ $commonTotal = 0;
 foreach ($rows as $row) {
     list($genba, $kouji, , , $roumuhi, $keihi) = array_pad($row, 6, '');
     if (empty($genba)) break;
+    if ($roumuhi == 0) continue;
 
     $codeInfo = findCode($genba, $kouji, $wpdb, $month);
     if (!$codeInfo) continue;
@@ -320,6 +318,7 @@ $commonTotal = 0;
 foreach ($rows as $row) {
     list($genba, $kouji, , , $roumuhi, $keihi) = array_pad($row, 6, '');
     if (empty($genba)) break;
+    if ($roumuhi == 0) continue;
 
     $codeInfo = findCode($genba, $kouji, $wpdb, $month);
     if (!$codeInfo) continue;

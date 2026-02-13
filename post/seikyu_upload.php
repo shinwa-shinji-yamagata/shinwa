@@ -35,9 +35,9 @@ if (!empty($savedPaths)) {
     $_SESSION['write_row'] = 9;
 
     $templatePath = $_SERVER['DOCUMENT_ROOT'] . '/post/template.xlsx';
-    $lastDate = date('Y-m-d');
-    $year = date('Y', strtotime($lastDate));
-    $month = date('n', strtotime($lastDate));
+    $lastMonthDate = date('Y-m-d', strtotime('first day of last month'));
+    $year = date('Y', strtotime($lastMonthDate));
+    $month = date('n', strtotime($lastMonthDate));
     $outputDir = $_SERVER['DOCUMENT_ROOT'] . '/post/output';
     if (!is_dir($outputDir)) {
         mkdir($outputDir, 0777, true);

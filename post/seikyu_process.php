@@ -114,6 +114,7 @@ switch ($formatType) {
 $vendorName = $columns['vendor'] ? trim((string)$sheet->getCell($columns['vendor'])->getValue()) : '';
 $rows = [];
 $hasCommon = false;
+$date = '';
 
 for ($row = 15; $row < 115; $row++) {
     $dateVal = $columns['date'] ? trim((string)$sheet->getCell("{$columns['date']}{$row}")->getValue()) : '';
@@ -125,11 +126,17 @@ for ($row = 15; $row < 115; $row++) {
     $genba = trim((string)$sheet->getCell("{$columns['genba']}{$row}")->getValue());
     $kouji = trim((string)$sheet->getCell("{$columns['kouji']}{$row}")->getValue());
 
-    // 日付の整形
-    if (is_numeric($dateVal)) {
-        $date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateVal)->format('Y/m/d');
-    } else {
-        $date = date('Y/m/d', strtotime($dateVal));
+    if( $date == '' ) {
+        // 日付の整形
+        if (is_numeric($dateVal)) {
+            $dateObj = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateVal);
+        } else {
+            $dateObj = new \DateTime($dateVal);
+        }
+
+        // 月末日に変更
+        $dateObj->modify('last day of this month');
+        $date = $dateObj->format('Y/m/d');
     }
 
     $amount = (float)str_replace(',', '', $amountVal);

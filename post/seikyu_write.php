@@ -82,6 +82,9 @@ foreach ($seikyuData as $fileIndex => $input) {
         $kamoku = $entry['kamoku'];
         $kamokuCode = ($kamoku == '610') ? '1610' : '1620';
         $indentCode = '      ' . $kamokuCode;
+        $kashiCode = ($kamoku == '610') ? '301' : '302';
+        $uchiKbun = ($kamoku == '610') ? '1' : '';
+        $uchiCode = ($kamoku == '610') ? '         0' : '';
         $date = $entry['date'];
         $taxRate = (float)$entry['tax'];
         $taxAmount = $entry['amount'] * ($taxRate / 100);
@@ -104,6 +107,8 @@ foreach ($seikyuData as $fileIndex => $input) {
         $sheet->setCellValue("K{$rowNo}", $entry['genba_code']);
         $sheet->setCellValue("L{$rowNo}", '001');
         $sheet->setCellValue("R{$rowNo}", $entry['gyousya_code']);
+        $sheet->setCellValue("T{$rowNo}", $uchiKbun);
+        $sheet->setCellValue("U{$rowNo}", $uchiCode);
         $sheet->setCellValue("Z{$rowNo}", $entry['amount']);
         $sheet->setCellValue("AA{$rowNo}", $taxAmount);
         $sheet->setCellValue("AG{$rowNo}", 2);
@@ -113,7 +118,7 @@ foreach ($seikyuData as $fileIndex => $input) {
         $sheet->setCellValue("AK{$rowNo}", $date);
         $sheet->setCellValue("AL{$rowNo}", '');
         $sheet->setCellValue("DA{$rowNo}", '001');
-        $sheet->setCellValue("DB{$rowNo}", '301');
+        $sheet->setCellValue("DB{$rowNo}", $kashiCode);
         $sheet->setCellValue("DC{$rowNo}", 2);
         $sheet->setCellValue("DD{$rowNo}", $entry['gyousya_code']);
         $sheet->setCellValue("DE{$rowNo}", 0);

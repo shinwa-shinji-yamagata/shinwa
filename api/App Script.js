@@ -38,15 +38,14 @@ function handleEdit(e) {
   if (isDelete) {
     range.clearDataValidations();
     range.setComment("");
-
+/*
     if (col === 3) {
       const subjectCell = sheet.getRange(row, 4);
       subjectCell.clearContent();
       subjectCell.clearDataValidations();
       subjectCell.setComment("");
     }
-
-    // 削除時もログ送信したいので return しない
+*/
   }
 
   // ------------------------------------------------------------
