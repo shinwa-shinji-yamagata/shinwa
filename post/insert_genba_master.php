@@ -203,7 +203,7 @@ try {
   }
 
   echo "{$inserted} 件を登録しました。";
-  sw_log("insert_genba_master.php","{$table_name} に {$inserted} 件登録しました。");
+  sw_log(basename(__FILE__),"{$table_name} に {$inserted} 件登録しました。");
 
 } catch (Exception $e) {
   $message = "Excelの読み込み中にエラーが発生しました : " . esc_html($e->getMessage());

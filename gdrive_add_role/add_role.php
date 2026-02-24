@@ -63,11 +63,11 @@ function addPermissions($service, $fileId, $email, $role, $fileName, $disp_role)
     try {
         $service->permissions->create($fileId, $permission, ['sendNotificationEmail' => false]);
         echo "✅ {$email} に {$role} 権限を付与しました\n";
-        sw_log("add_role.php","[$fileName]に権限を付与 {$email}：{$disp_role}");
+        sw_log(basename(__FILE__),"[$fileName]に権限を付与 {$email}：{$disp_role}");
     } catch (Exception $e) {
         $message = "{$email} への権限付与に失敗: " . $e->getMessage();
         echo "⚠️ $message" . $e->getMessage() . "\n";
-        sw_log("add_role.php","[$fileName]への権限付与に失敗 {$email}：$disp_role} " . $e->getMessage(),"ERROR");
+        sw_log(basename(__FILE__),"[$fileName]への権限付与に失敗 {$email}：$disp_role} " . $e->getMessage(),"ERROR");
     }
 }
 

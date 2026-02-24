@@ -478,7 +478,7 @@ $loopCount++;
 $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
 $writer->save($outputPath);
 
-sw_log('shiwake.php',"PROCES.S向けExcelファイル「{$year}年{$month}月.xlsx」を生成しました。");
+sw_log(basename(__FILE__),"PROCES.S向けExcelファイル「{$year}年{$month}月.xlsx」を生成しました。");
 
 header('Content-Type: application/json');
 echo json_encode([

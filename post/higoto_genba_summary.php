@@ -50,9 +50,6 @@ try {
   }
 
   $php_file = "higoto_summary.php";
-  if ($year < 2025 || ($year == 2025 && $month <= 10)) {
-    $php_file = "higoto_summary202510.php";
-  }
 
   // 集計コマンド実行
   $command = "php /home/shinwax/shinwa1.com/public_html/post/$php_file $year $month 2>&1";
@@ -85,10 +82,10 @@ try {
 
   // 完了メッセージ
   echo json_encode(['success' => true, 'message' => "✅ {$year}年{$month}月分の集計が完了しました<br><br><a href='{$link}' target='_blank'>月集計シートを開く</a>"]);
-  sw_log("post_day_kanri_summary.php","{$year}年{$month}月分の集計が完了しました");
+  sw_log(basename(__FILE__),"{$year}年{$month}月分の集計が完了しました");
 
 } catch (Exception $e) {
-  sw_log("post_day_kanri_summary.php",$e->getMessage(),"ERROR");
+  sw_log(basename(__FILE__),$e->getMessage(),"ERROR");
   echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 

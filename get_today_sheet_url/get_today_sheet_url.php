@@ -55,14 +55,14 @@ $rootFolderId = '1nD5lxVyyOIpfJ4B949ArDWNL7ka9xJVt'; // ←ここにルートフ
 $yearFolderId = getFolderIdByName($drive, $rootFolderId, $yearFolderName);
 if (!$yearFolderId) {
     throw new Exception("年フォルダが見つかりません: {$yearFolderName}");
-    sw_log("get_today_sheet_url.php","年フォルダが見つかりません: {$yearFolderName}","ERROR");
+    sw_log(basename(__FILE__),"年フォルダが見つかりません: {$yearFolderName}","ERROR");
 }
 
 // スプレッドシートIDを取得
 $spreadsheetId = getSpreadsheetIdByName($drive, $yearFolderId, $spreadsheetName);
 if (!$spreadsheetId) {
     throw new Exception("スプレッドシートが見つかりません: {$spreadsheetName}");
-    sw_log("get_today_sheet_url.php","スプレッドシートが見つかりません: {$spreadsheetName}","ERROR");
+    sw_log(basename(__FILE__),"スプレッドシートが見つかりません: {$spreadsheetName}","ERROR");
 }
 
 // 日付シート名（例：「3日」）
@@ -81,7 +81,7 @@ foreach ($spreadsheet->getSheets() as $sheet) {
 
 if ($sheetGid === null) {
     throw new Exception("{$day}日 シートが見つかりません");
-    sw_log("get_today_sheet_url.php","{$day}日 シートが見つかりません","ERROR");
+    sw_log(basename(__FILE__),"{$day}日 シートが見つかりません","ERROR");
 }
 
 $sheetUrl = "https://docs.google.com/spreadsheets/d/{$spreadsheetId}/edit#gid={$sheetGid}&range={$day}日!A1";
@@ -101,7 +101,7 @@ $stmt = $mysqli->prepare("UPDATE {$table} SET url = ? WHERE id = 1");
 $stmt->bind_param('s', $sheetUrl);
 if ($stmt->execute()) {
     echo "✅ URL更新成功: {$sheetUrl}\n";
-    sw_log("get_today_sheet_url.php","{$year}年{$month}月{$day}日のシートURLを更新しました。URL=$sheetUrl");
+    sw_log(basename(__FILE__),"{$year}年{$month}月{$day}日のシートURLを更新しました。URL=$sheetUrl");
 } else {
     echo "❌ URL更新失敗: " . $stmt->error . "\n";
 }

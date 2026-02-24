@@ -149,7 +149,7 @@ $writer->save($outputPath);
 $downloadUrl = htmlspecialchars(str_replace($_SERVER['DOCUMENT_ROOT'], '', $outputPath));
 
 $filename = basename($outputPath);
-sw_log('seikyu_write.php',"PROCES.S向けExcelファイル「{$filename}」を生成しました。");
+sw_log(basename(__FILE__),"PROCES.S向けExcelファイル「{$filename}」を生成しました。");
 
 ?>
 <!DOCTYPE html>
@@ -220,6 +220,7 @@ sw_log('seikyu_write.php',"PROCES.S向けExcelファイル「{$filename}」を�
     <a href="/post/seikyu_process.php?back=1" class="btn btn-back" id="back-button">戻る</a>
     <a href="/seikyu/" class="btn btn-reset" onclick="resetAndGoBack()">最初に戻る</a>
   </div>
+  <div style="margin-top: 20px;">ここで生成されたExcelは、PROCES.Sの画面で「管理」→「ﾃﾞｰﾀｲﾝﾎﾟｰﾄ」→「対象テーブル：更新仕分データ」→「コード：ｼﾝﾜ ｼﾝﾜﾄﾘｺﾐ」→「開始」からインポートできます。</div>
 
 <script>
   const downloadBtn = document.querySelector('.btn-download');
