@@ -64,6 +64,87 @@ function write_to_sheet($sheetsService, $spreadsheetId, $year, $month) {
     ]), ['valueInputOption' => 'RAW']);
 }
 
+// 「月工程」シートのAT1に newYear/newMonth/01 を書き込む
+function write_month_start_date($sheetsService, $spreadsheetId, $year, $month) {
+    $dateStr = sprintf("%04d/%02d/01", $year, $month);
+
+    $sheetsService->spreadsheets_values->update(
+        $spreadsheetId,
+        '月工程!AT1',
+        new Google_Service_Sheets_ValueRange([
+            'values' => [[ $dateStr ]],
+        ]),
+        ['valueInputOption' => 'USER_ENTERED']
+    );
+}
+
+function adjust_month_columns($sheetsService, $spreadsheetId, $daysInMonth) {
+
+    $spreadsheet = $sheetsService->spreadsheets->get($spreadsheetId);
+    $sheetId = null;
+
+    foreach ($spreadsheet->getSheets() as $sheet) {
+        if ($sheet->getProperties()->getTitle() === '月工程') {
+            $sheetId = $sheet->getProperties()->getSheetId();
+            break;
+        }
+    }
+
+    if ($sheetId === null) {
+        error_log("シート '月工程' が見つかりません。");
+        return;
+    }
+
+    $requests = [];
+
+    if ($daysInMonth === 30) {
+        // 31日（AM = index 38）を削除
+        $requests[] = [
+            'deleteDimension' => [
+                'range' => [
+                    'sheetId' => $sheetId,
+                    'dimension' => 'COLUMNS',
+                    'startIndex' => 38, // AM
+                    'endIndex' => 39
+                ]
+            ]
+        ];
+
+    } elseif ($daysInMonth === 29) {
+        // 30日・31日（AL=37, AM=38）を削除
+        $requests[] = [
+            'deleteDimension' => [
+                'range' => [
+                    'sheetId' => $sheetId,
+                    'dimension' => 'COLUMNS',
+                    'startIndex' => 37, // AL
+                    'endIndex' => 39   // AM の次
+                ]
+            ]
+        ];
+
+    } elseif ($daysInMonth === 28) {
+        // 29〜31日（AK=36, AL=37, AM=38）を削除
+        $requests[] = [
+            'deleteDimension' => [
+                'range' => [
+                    'sheetId' => $sheetId,
+                    'dimension' => 'COLUMNS',
+                    'startIndex' => 36, // AK
+                    'endIndex' => 39   // AM の次
+                ]
+            ]
+        ];
+    }
+
+    if (!empty($requests)) {
+        $batchUpdateRequest = new Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
+            'requests' => $requests
+        ]);
+        $sheetsService->spreadsheets->batchUpdate($spreadsheetId, $batchUpdateRequest);
+    }
+}
+
 // 指定名のシートを削除
 function delete_sheet_by_name($sheetsService, $spreadsheetId, $sheetName) {
     $spreadsheet = $sheetsService->spreadsheets->get($spreadsheetId);
@@ -128,8 +209,10 @@ sw_log(basename(__FILE__),"スプレッドシート template を {$newYear}年/{
 $newFileId = $copiedFile->getId();
 move_file($driveService, $newFileId, $targetFolderId);
 write_to_sheet($sheetsService, $newFileId, $newYear, $newMonth);
+write_month_start_date($sheetsService, $newFileId, $newYear, $newMonth);
 
 $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $newMonth, $newYear);
+adjust_month_columns($sheetsService, $newFileId, $daysInMonth);
 for ($i = $daysInMonth + 1; $i <= 31; $i++) {
     delete_sheet_by_name($sheetsService, $newFileId, "{$i}日");
 }

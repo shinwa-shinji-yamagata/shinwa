@@ -94,7 +94,7 @@ $rows = $response->getValues();
 
 // Excelテンプレート準備
 $templatePath = __DIR__ . "/template.xlsx";
-$outputPath = $outputDir . "/仕分_{$year}年{$month}月.xlsx";
+$outputPath = $outputDir . "/PORCESS向け仕分_{$year}年{$month}月.xlsx";
 
 if (file_exists($outputPath)) {
     unlink($outputPath);
@@ -478,10 +478,10 @@ $loopCount++;
 $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
 $writer->save($outputPath);
 
-sw_log(basename(__FILE__),"PROCES.S向けExcelファイル「{$year}年{$month}月.xlsx」を生成しました。");
+sw_log(basename(__FILE__),"PROCES.S向けExcelファイル「PORCESS向け仕分_{$year}年{$month}月.xlsx」を生成しました。");
 
 header('Content-Type: application/json');
 echo json_encode([
   'success' => true,
-  'message' => "PROCES.S向けExcelファイル {$year}年{$month}月.xlsx を生成しました。<br><a href='/post/output/仕分_{$year}年{$month}月.xlsx'>ダウンロード</a>",
+  'message' => "PROCES.S向けExcelファイル「PORCESS向け仕分_{$year}年{$month}月.xlsx」を生成しました。<br><a href='/post/output/PORCESS向け仕分_{$year}年{$month}月.xlsx'>ダウンロード</a>",
 ]);
