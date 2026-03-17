@@ -97,41 +97,21 @@ function adjust_month_columns($sheetsService, $spreadsheetId, $daysInMonth) {
 
     $requests = [];
 
-    if ($daysInMonth === 30) {
-        // 31日（AM = index 38）を削除
+    $startIndex = match ($daysInMonth) {
+        30 => 38, // 31日削除
+        29 => 37, // 30・31日削除
+        28 => 36, // 29〜31日削除
+        default => null, // 31日の月は削除なし
+    };
+
+    if ($startIndex !== null) {
         $requests[] = [
             'deleteDimension' => [
                 'range' => [
                     'sheetId' => $sheetId,
                     'dimension' => 'COLUMNS',
-                    'startIndex' => 38, // AM
+                    'startIndex' => $startIndex,
                     'endIndex' => 39
-                ]
-            ]
-        ];
-
-    } elseif ($daysInMonth === 29) {
-        // 30日・31日（AL=37, AM=38）を削除
-        $requests[] = [
-            'deleteDimension' => [
-                'range' => [
-                    'sheetId' => $sheetId,
-                    'dimension' => 'COLUMNS',
-                    'startIndex' => 37, // AL
-                    'endIndex' => 39   // AM の次
-                ]
-            ]
-        ];
-
-    } elseif ($daysInMonth === 28) {
-        // 29〜31日（AK=36, AL=37, AM=38）を削除
-        $requests[] = [
-            'deleteDimension' => [
-                'range' => [
-                    'sheetId' => $sheetId,
-                    'dimension' => 'COLUMNS',
-                    'startIndex' => 36, // AK
-                    'endIndex' => 39   // AM の次
                 ]
             ]
         ];

@@ -12,7 +12,7 @@ if (isset($_SESSION['upload_result'])) {
 }
 ?>
 <div style="margin-bottom:20px;">
-<b>【現場名一覧のExcel取得手順】</b><br>
+<b>【業者一覧のExcel取得手順】</b><br>
   PROCES.Sの画面から「マスタ」タブ→「取引情報照会」→「F5：抽出」→「F9：Excel出力」
 </div>
 <div class="gyousya-container">
