@@ -105,19 +105,19 @@ $spreadsheet = IOFactory::load($outputPath);
 $sheet = $spreadsheet->getActiveSheet();
 
 // DB検索関数
-function findCode($genba, $kouji, $wpdb, $month) {
+function findCode($genba, $kouji, $wpdb, $genba_code) {
     $results = $wpdb->get_results("SELECT * FROM sw_genba_master ORDER BY id DESC");
     foreach ($results as $row) {
-        if ($row->name === $genba && $row->subject === $kouji) return ['code' => $row->code, 'd_code' => $row->d_code];
+        if ($row->name === $genba) return ['code' => $row->code, 'd_code' => $row->d_code];
     }
 /*
     foreach ($results as $row) {
         if ($row->name === $genba) return ['code' => $row->code, 'd_code' => $row->d_code];
     }
 */
-    $commonGenba = "共通原価（{$month}月）";
+    $commonGenba = "共通原価（未定）";
     foreach ($results as $row) {
-        if ($row->name === $commonGenba && $row->subject === "共通原価") return ['code' => $row->code, 'd_code' => $row->d_code, 'is_common' => true];
+        if ($row->name === $commonGenba && $row->code === $genba_code) return ['code' => $row->code, 'd_code' => $row->d_code, 'is_common' => true];
     }
     return null;
 }
@@ -148,35 +148,48 @@ $rowIndex = 9;
 $loopCount = 1;
 $total = 0;
 $commonCode = null;
+$commonDcode = null;
 $commonTotal = 0;
+$amount = 0;
 
-foreach ($rows as $row) {
+for ($i = 0; $i < count($rows); $i++ ) {
+    $j = $i + 1;
+    $row = isset($rows[$i]) ? $rows[$i] : [];
     list($genba, $kouji, , , $roumuhi, $keihi) = array_pad($row, 6, '');
+    $row = isset($rows[$j]) ? $rows[$j] : [];
+    list($next_genba, $next_kouji, , , $next_roumuhi, $next_keihi) = array_pad($row, 6, '');
     if (empty($genba)) break;
     if ($roumuhi == 0) continue;
 
-    $codeInfo = findCode($genba, $kouji, $wpdb, $month);
+    $codeInfo = findCode($genba, $kouji, $wpdb, $genba_code);
     if (!$codeInfo) continue;
+    $nextCodeInfo = findCode($next_genba, $next_kouji, $wpdb, $genba_code);
+    if (!$codeInfo) $nextCodeInfo['code'] = "";
 
     $code = $codeInfo['code'];
+    $next_code = $nextCodeInfo['code'];
+
     $d_code = $codeInfo['d_code'];
     $isCommon = !empty($codeInfo['is_common']);
 
-    $amount = parseAmount($roumuhi);
-    $total += $amount; // ここでエラー
+    if( !$isCommon ) {
+        $amount += parseAmount($roumuhi);
+    }
+    $total += parseAmount($roumuhi);
 
     if ($isCommon) {
         $commonCode = $code;
+        $commonDcode = $d_code;
         $commonTotal += (float)str_replace(',', '', $roumuhi);
         continue;
     }
 
-    $bikou = '';
-    if( $kouji != '' ) {
-        $bikou = mb_convert_kana("{$genba}：{$kouji}", "k", "UTF-8");
-    } else {
-        $bikou = mb_convert_kana("{$genba}", "k", "UTF-8");
+    if( $code == $next_code ) {
+        continue;
     }
+
+    $bikou = '';
+    $bikou = mb_convert_kana("{$genba}", "k", "UTF-8");
 
     // 書き込み
     $sheet->setCellValue("B{$rowIndex}", "1");
@@ -190,11 +203,11 @@ foreach ($rows as $row) {
     $sheet->setCellValue("I{$rowIndex}", "      1641");
     $sheet->setCellValue("J{$rowIndex}", "1641");
     $sheet->setCellValue("K{$rowIndex}", $code);
-    $sheet->setCellValue("L{$rowIndex}", $d_code);
+    $sheet->setCellValue("L{$rowIndex}", "001");
     $sheet->setCellValue("R{$rowIndex}", "39001");
     $sheet->setCellValue("T{$rowIndex}", "1");
     $sheet->setCellValue("U{$rowIndex}", "         0");
-    $sheet->setCellValue("Z{$rowIndex}", $roumuhi);
+    $sheet->setCellValue("Z{$rowIndex}", $amount);
     $sheet->setCellValue("AA{$rowIndex}", "0");
     $sheet->setCellValue("AG{$rowIndex}", "1");
     $sheet->setCellValue("AH{$rowIndex}", "1");
@@ -219,6 +232,7 @@ foreach ($rows as $row) {
 
     $rowIndex++;
     $loopCount++;
+    $amount = 0;
 }
 
 // 共通原価行の追加
@@ -234,8 +248,8 @@ if ($commonCode && $commonTotal > 0) {
     $sheet->setCellValue("H{$rowIndex}", "8");
     $sheet->setCellValue("I{$rowIndex}", "      1641");
     $sheet->setCellValue("J{$rowIndex}", "1641");
-    $sheet->setCellValue("K{$rowIndex}", $genba_code);
-    $sheet->setCellValue("L{$rowIndex}", '013');
+    $sheet->setCellValue("K{$rowIndex}", $commonCode);
+    $sheet->setCellValue("L{$rowIndex}", $commonDcode);
     $sheet->setCellValue("R{$rowIndex}", "39001");
     $sheet->setCellValue("T{$rowIndex}", "1");
     $sheet->setCellValue("U{$rowIndex}", "         0");
@@ -293,7 +307,7 @@ $sheet->setCellValue("DB{$rowIndex}", "170");
 $sheet->setCellValue("DC{$rowIndex}", "8");
 $sheet->setCellValue("DD{$rowIndex}", "      1641");
 $sheet->setCellValue("DE{$rowIndex}", "1641");
-$sheet->setCellValue("DF{$rowIndex}", $genba_code);
+$sheet->setCellValue("DF{$rowIndex}", $commonCode);
 $sheet->setCellValue("DG{$rowIndex}", $monthCode);
 $sheet->setCellValue("DM{$rowIndex}", "39001");
 $sheet->setCellValue("DO{$rowIndex}", "1");
@@ -313,34 +327,48 @@ $loopCount++;
 
 $total = 0;
 $commonCode = null;
+$commonDcode = null;
 $commonTotal = 0;
+$amount = 0;
 
-foreach ($rows as $row) {
+for ($i = 0; $i < count($rows); $i++ ) {
+    $j = $i + 1;
+    $row = isset($rows[$i]) ? $rows[$i] : [];
     list($genba, $kouji, , , $roumuhi, $keihi) = array_pad($row, 6, '');
+    $row = isset($rows[$j]) ? $rows[$j] : [];
+    list($next_genba, $next_kouji, , , $next_roumuhi, $next_keihi) = array_pad($row, 6, '');
     if (empty($genba)) break;
     if ($roumuhi == 0) continue;
 
-    $codeInfo = findCode($genba, $kouji, $wpdb, $month);
+    $codeInfo = findCode($genba, $kouji, $wpdb, $genba_code);
     if (!$codeInfo) continue;
+    $nextCodeInfo = findCode($next_genba, $next_kouji, $wpdb, $genba_code);
+    if (!$codeInfo) $nextCodeInfo['code'] = "";
 
     $code = $codeInfo['code'];
+    $next_code = $nextCodeInfo['code'];
+
     $d_code = $codeInfo['d_code'];
     $isCommon = !empty($codeInfo['is_common']);
 
-    $total += (float)str_replace(',', '', $keihi);
+    if( !$isCommon ) {
+        $amount += parseAmount($keihi);
+    }
+    $total += parseAmount($keihi);
 
     if ($isCommon) {
         $commonCode = $code;
+        $commonDcode = $d_code;
         $commonTotal += (float)str_replace(',', '', $keihi);
         continue;
     }
 
-    $bikou = '';
-    if( $kouji != '' ) {
-        $bikou = mb_convert_kana("{$genba}：{$kouji}", "k", "UTF-8");
-    } else {
-        $bikou = mb_convert_kana("{$genba}", "k", "UTF-8");
+    if( $code == $next_code ) {
+        continue;
     }
+
+    $bikou = '';
+    $bikou = mb_convert_kana("{$genba}", "k", "UTF-8");
 
     // 書き込み
     $sheet->setCellValue("B{$rowIndex}", "1");
@@ -354,11 +382,11 @@ foreach ($rows as $row) {
     $sheet->setCellValue("I{$rowIndex}", "      1672");
     $sheet->setCellValue("J{$rowIndex}", "1672");
     $sheet->setCellValue("K{$rowIndex}", $code);
-    $sheet->setCellValue("L{$rowIndex}", $d_code);
+    $sheet->setCellValue("L{$rowIndex}", "001");
     $sheet->setCellValue("R{$rowIndex}", "39002");
     $sheet->setCellValue("T{$rowIndex}", "1");
     $sheet->setCellValue("U{$rowIndex}", "         0");
-    $sheet->setCellValue("Z{$rowIndex}", $keihi);
+    $sheet->setCellValue("Z{$rowIndex}", $amount);
     $sheet->setCellValue("AA{$rowIndex}", "0");
     $sheet->setCellValue("AG{$rowIndex}", "1");
     $sheet->setCellValue("AH{$rowIndex}", "1");
@@ -383,6 +411,7 @@ foreach ($rows as $row) {
 
     $rowIndex++;
     $loopCount++;
+    $amount = 0;
 }
 
 // 共通原価行の追加
@@ -398,8 +427,8 @@ if ($commonCode && $commonTotal > 0) {
     $sheet->setCellValue("H{$rowIndex}", "8");
     $sheet->setCellValue("I{$rowIndex}", "      1672");
     $sheet->setCellValue("J{$rowIndex}", "1672");
-    $sheet->setCellValue("K{$rowIndex}", $genba_code);
-    $sheet->setCellValue("L{$rowIndex}", '013');
+    $sheet->setCellValue("K{$rowIndex}", $commonCode);
+    $sheet->setCellValue("L{$rowIndex}", $commonDcode);
     $sheet->setCellValue("R{$rowIndex}", "39002");
     $sheet->setCellValue("T{$rowIndex}", "1");
     $sheet->setCellValue("U{$rowIndex}", "         0");
@@ -423,7 +452,7 @@ if ($commonCode && $commonTotal > 0) {
     $sheet->setCellValue("ED{$rowIndex}", "0");
     $sheet->setCellValue("EE{$rowIndex}", "0");
     $sheet->setCellValue("EF{$rowIndex}", $monthEnd);
-    $sheet->setCellValue("EG{$rowIndex}", "{$month}月労務費");
+    $sheet->setCellValue("EG{$rowIndex}", "{$month}月経費");
     $sheet->setCellValue("GW{$rowIndex}", "9");
     $rowIndex++;
     $loopCount++;
@@ -457,7 +486,7 @@ $sheet->setCellValue("DB{$rowIndex}", "170");
 $sheet->setCellValue("DC{$rowIndex}", "8");
 $sheet->setCellValue("DD{$rowIndex}", "      1672");
 $sheet->setCellValue("DE{$rowIndex}", "1672");
-$sheet->setCellValue("DF{$rowIndex}", $genba_code);
+$sheet->setCellValue("DF{$rowIndex}", $commonCode);
 $sheet->setCellValue("DG{$rowIndex}", $monthCode);
 $sheet->setCellValue("DM{$rowIndex}", "39002");
 $sheet->setCellValue("DO{$rowIndex}", "1");

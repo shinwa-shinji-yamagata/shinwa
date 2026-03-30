@@ -85,6 +85,9 @@ foreach ($seikyuData as $fileIndex => $input) {
         $kashiCode = ($kamoku == '610') ? '301' : '302';
         $uchiKbun = ($kamoku == '610') ? '1' : '';
         $uchiCode = ($kamoku == '610') ? '         0' : '';
+        // 科目コード170固定対応 内訳区分とコードも固定に
+        $uchiKbun = '1';
+        $uchiCode = '         0';
         $date = $entry['date'];
         $taxRate = (float)$entry['tax'];
         $taxAmount = $entry['amount'] * ($taxRate / 100);
@@ -100,7 +103,7 @@ foreach ($seikyuData as $fileIndex => $input) {
         $sheet->setCellValue("D{$rowNo}", $fileSerial);
         $sheet->setCellValue("E{$rowNo}", $lineSerial);
         $sheet->setCellValue("F{$rowNo}", '001');
-        $sheet->setCellValue("G{$rowNo}", $kamoku);
+        $sheet->setCellValue("G{$rowNo}", '170');
         $sheet->setCellValue("H{$rowNo}", 8);
         $sheet->setCellValue("I{$rowNo}", $indentCode);
         $sheet->setCellValue("J{$rowNo}", $kamokuCode);
