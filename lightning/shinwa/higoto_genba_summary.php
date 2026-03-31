@@ -4,7 +4,7 @@ global $wpdb;
 $table_name = $wpdb->prefix . 'aggregation_status';
 
 // 現在の1か月前の年月を取得
-$prevMonth = strtotime('-1 month');
+$prevMonth = strtotime('first day of this month -1 month');
 $defaultYear = date('Y', $prevMonth);
 $defaultMonth = date('m', $prevMonth);
 $defaultDisplay = $defaultYear . '年' . $defaultMonth . '月';
