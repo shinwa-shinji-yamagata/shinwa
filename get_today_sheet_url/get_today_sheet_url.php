@@ -99,12 +99,91 @@ $table = 'sw_today_sheet';
 // UPDATE実行
 $stmt = $mysqli->prepare("UPDATE {$table} SET url = ? WHERE id = 1");
 $stmt->bind_param('s', $sheetUrl);
+$kekka = true;
 if ($stmt->execute()) {
     echo "✅ URL更新成功: {$sheetUrl}\n";
-    sw_log(basename(__FILE__),"{$year}年{$month}月{$day}日のシートURLを更新しました。URL=$sheetUrl");
 } else {
+    $kekka = false;
     echo "❌ URL更新失敗: " . $stmt->error . "\n";
 }
 
 $stmt->close();
 $mysqli->close();
+
+// ▼▼▼ 管理部作業日報（6人分）のURL更新処理 ▼▼▼
+
+global $wpdb;
+$table_nippou = "sw_kanribu_nippou";
+
+// 今日の year, month を文字列化
+$yearStr  = "{$year}年";
+$monthStr = "{$year}年{$month}月";
+
+// 対象レコードを取得（6人分）
+$rows = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT id, name, url FROM {$table_nippou} WHERE year = %s AND month = %s",
+        $yearStr,
+        $monthStr
+    )
+);
+
+if ($rows) {
+    foreach ($rows as $row) {
+
+        // URL から spreadsheetId を抽出
+        // 例: https://docs.google.com/spreadsheets/d/XXXXX/edit...
+        if (!preg_match('#/d/([a-zA-Z0-9-_]+)#', $row->url, $m)) {
+            sw_log(basename(__FILE__), "URLからspreadsheetIdを抽出できません: {$row->url}", "ERROR");
+            continue;
+        }
+
+        $spreadsheetId = $m[1];
+
+        // スプレッドシート取得
+        try {
+            $spreadsheet = $sheets->spreadsheets->get($spreadsheetId);
+        } catch (Exception $e) {
+            sw_log(basename(__FILE__), "スプレッドシート取得失敗: {$spreadsheetId}", "ERROR");
+            continue;
+        }
+
+        // 今日の「〇日」シートの gid を探す
+        $sheetGid = null;
+        foreach ($spreadsheet->getSheets() as $sheet) {
+            if ($sheet->getProperties()->getTitle() === "{$day}日") {
+                $sheetGid = $sheet->getProperties()->getSheetId();
+                break;
+            }
+        }
+
+        if ($sheetGid === null) {
+            sw_log(basename(__FILE__), "{$row->name} の {$day}日 シートが見つかりません", "ERROR");
+            continue;
+        }
+
+        // 新しいURLを生成
+        $newUrl = "https://docs.google.com/spreadsheets/d/{$spreadsheetId}/edit#gid={$sheetGid}&range={$day}日!A1";
+
+        // DB更新
+        $wpdb->update(
+            $table_nippou,
+            ['url' => $newUrl],
+            ['id' => $row->id],
+            ['%s'],
+            ['%d']
+        );
+
+    }
+
+    echo "✅ 管理部作業日報（6人分）のURL更新完了\n";
+} else {
+    $kekka = false;
+    echo "⚠ 対象の管理部作業日報レコードがありません\n";
+}
+
+if( $kekka ) {
+    sw_log(basename(__FILE__),"日毎管理表、作業日報のシートURLを更新しました。");
+} else {
+    sw_log(basename(__FILE__),"日毎管理表または作業日報のシートURLの更新に失敗しました。","ERROR");
+}

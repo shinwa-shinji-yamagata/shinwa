@@ -236,6 +236,7 @@ function custom_link_buttons_shortcode() {
         ['label' => '日毎現場表（今日）', 'url' => $today_url, 'color' => '#fdebd0'],
         ['label' => '日毎現場表 月次集計', 'url' => '/monthly_higoto_genba_sum/', 'color' => '#d5f5e3'],
         ['label' => '請求書→PROCESS向けExcel', 'url' => '/seikyu/', 'color' => '#d0ece7'],
+        ['label' => '管理部作業日報', 'url' => '/kanribu_nippou/', 'color' => '#fae5d3'],
         ['label' => '注文書', 'url' => 'https://drive.google.com/drive/folders/1hQR_l1-4xlnxazHy5GHJlRHxBz96i-m0', 'color' => '#e8daef'],
         ['label' => '業者マスタ', 'url' => '/gyousya_master/', 'color' => '#f9ebea'],
         ['label' => '現場マスタ', 'url' => '/genba_master/', 'color' => '#d1f2eb'],
@@ -1067,3 +1068,71 @@ function swpad_upload_photo() {
 
   wp_send_json_success();
 }
+
+function shinwa_nippou_styles() {
+    ?>
+    <style>
+        .btn-year, .btn-month {
+            display: block;
+            width: 500px;
+            margin: 10px auto;
+            padding: 14px;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 20px;
+            text-decoration: none !important;
+            color: #333 !important;
+        }
+
+        .btn-year { background: #e8f4fa; }
+        .btn-month { background: #fdebd0; }
+
+        .name-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 1000px;
+            gap: 12px;
+            margin: 0 auto;
+            margin-top: 30px;
+            justify-items: center; /* ← 中央寄せ */
+        }
+
+        .btn-name {
+            width: 300px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none !important;
+            color: #333 !important;
+        }
+
+        /* 個人別カラー */
+        .btn-kuroda  { background: #d6eaf8; }
+        .btn-inagaki { background: #fdebd0; }
+        .btn-kuriyama{ background: #d5f5e3; }
+        .btn-kurihara{ background: #e8daef; }
+        .btn-tokita  { background: #f9ebea; }
+        .btn-kadowaki{ background: #fef5e7; }
+
+        .btn-name.disabled {
+            background: #eee;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .btn-year,
+        .btn-month,
+        .btn-name {
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn-year:hover,
+        .btn-month:hover,
+        .btn-name:hover {
+            transform: translateY(-4px); /* 少し浮く */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* 影がつく */
+        }
+    </style>
+    <?php
+}
+add_action('wp_head', 'shinwa_nippou_styles');

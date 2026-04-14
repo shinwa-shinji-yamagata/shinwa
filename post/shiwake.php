@@ -106,19 +106,55 @@ $sheet = $spreadsheet->getActiveSheet();
 
 // DB検索関数
 function findCode($genba, $kouji, $wpdb, $genba_code) {
+
+    // POSTされた年（例：2025, 2026）
+    $year = isset($_POST['year']) ? (int)$_POST['year'] : 0;
+
+    // 下二桁を取得（例：2026 → 26）
+    $yy = (int)substr($year, -2);
+
+    // 許容する最小値（例：26 → 24）
+    $minYear = $yy - 2;
+
     $results = $wpdb->get_results("SELECT * FROM sw_genba_master ORDER BY id DESC");
+
+    // ① 通常の現場（共通原価以外） → 年フィルタあり
     foreach ($results as $row) {
-        if ($row->name === $genba) return ['code' => $row->code, 'd_code' => $row->d_code];
+
+        // 共通原価はここではスキップ
+        if ($row->name === "共通原価（未定）") {
+            continue;
+        }
+
+        // code の先頭2桁
+        $codeYear = (int)substr($row->code, 0, 2);
+
+        // 年フィルタ：POSTされた年の下二桁 -2 以上のみ対象
+        if ($codeYear < $minYear) {
+            continue;
+        }
+
+        // 現場名一致
+        if ($row->name === $genba) {
+            return [
+                'code'   => $row->code,
+                'd_code' => $row->d_code
+            ];
+        }
     }
-/*
-    foreach ($results as $row) {
-        if ($row->name === $genba) return ['code' => $row->code, 'd_code' => $row->d_code];
-    }
-*/
+
+    // ② 共通原価（未定） → 年フィルタ不要
     $commonGenba = "共通原価（未定）";
     foreach ($results as $row) {
-        if ($row->name === $commonGenba && $row->code === $genba_code) return ['code' => $row->code, 'd_code' => $row->d_code, 'is_common' => true];
+        if ($row->name === $commonGenba && $row->code === $genba_code) {
+            return [
+                'code'     => $row->code,
+                'd_code'   => $row->d_code,
+                'is_common'=> true
+            ];
+        }
     }
+
     return null;
 }
 
