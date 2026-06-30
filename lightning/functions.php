@@ -227,23 +227,46 @@ function custom_login_redirect( $redirect_to, $request, $user ) {
 }
 add_filter( 'login_redirect', 'custom_login_redirect', 10, 3 );
 
+add_filter('body_class', function($classes) {
+    if (strpos($_SERVER['HTTP_HOST'], 'shinwax.xsrv.jp') !== false) {
+        $classes[] = 'swl-test-env';
+    }
+    return $classes;
+});
+
 function custom_link_buttons_shortcode() {
     global $wpdb;
     $today_url = esc_url($wpdb->get_var("SELECT url FROM sw_today_sheet WHERE id = 1"));
 
-    $buttons = [
-        ['label' => '日毎現場表（TOP）', 'url' => 'https://drive.google.com/drive/folders/1nD5lxVyyOIpfJ4B949ArDWNL7ka9xJVt', 'color' => '#d6eaf8'],
-        ['label' => '日毎現場表（今日）', 'url' => $today_url, 'color' => '#fdebd0'],
-        ['label' => '日毎現場表 月次集計', 'url' => '/monthly_higoto_genba_sum/', 'color' => '#d5f5e3'],
-        ['label' => '請求書→PROCESS向けExcel', 'url' => '/seikyu/', 'color' => '#d0ece7'],
-        ['label' => '管理部作業日報', 'url' => '/kanribu_nippou/', 'color' => '#fae5d3'],
-        ['label' => '注文書', 'url' => 'https://drive.google.com/drive/folders/1hQR_l1-4xlnxazHy5GHJlRHxBz96i-m0', 'color' => '#e8daef'],
-        ['label' => '業者マスタ', 'url' => '/gyousya_master/', 'color' => '#f9ebea'],
-        ['label' => '現場マスタ', 'url' => '/genba_master/', 'color' => '#d1f2eb'],
-        ['label' => '新和なんでもAIボット', 'url' => '/shinwabot/', 'color' => '#fef5e7'],
-        ['label' => '社員マスタ', 'url' => '/staff_master/', 'color' => '#f5b7b1'],
-        ['label' => 'ユーザー管理', 'url' => '/wp-admin/users.php', 'color' => '#d5dbdb'],
-        ['label' => 'ログ参照', 'url' => '/log_display/', 'color' => '#f2f3f4'],
+    // カテゴリごとにボタンを整理
+    $categories = [
+        '日毎現場表' => [
+            ['label' => '日毎現場表（TOP）', 'url' => 'https://drive.google.com/drive/folders/1nD5lxVyyOIpfJ4B949ArDWNL7ka9xJVt', 'color' => '#d6eaf8'],
+            ['label' => '日毎現場表（今日）', 'url' => $today_url, 'color' => '#fdebd0'],
+        ],
+        '月次集計' => [
+            ['label' => '日毎現場表 月次集計', 'url' => '/monthly_higoto_genba_sum/', 'color' => '#d5f5e3'],
+            ['label' => '請求書→PROCESS向けExcel', 'url' => '/seikyu/', 'color' => '#d0ece7'],
+        ],
+        '管理業務' => [
+            ['label' => '管理部作業日報', 'url' => '/kanribu_nippou/', 'color' => '#fae5d3'],
+            ['label' => '休暇申請', 'url' => '/leave-request/', 'color' => '#eaf7d5'],
+        ],
+        'マスタ' => [
+            ['label' => '業者マスタ', 'url' => '/gyousya_master/', 'color' => '#f9ebea'],
+            ['label' => '現場マスタ', 'url' => '/genba_master/', 'color' => '#d1f2eb'],
+        ],
+        'その他' => [
+            ['label' => '注文書', 'url' => 'https://drive.google.com/drive/folders/1hQR_l1-4xlnxazHy5GHJlRHxBz96i-m0', 'color' => '#e8daef'],
+            ['label' => '新和なんでもAIボット', 'url' => '/shinwabot/', 'color' => '#fef5e7'],
+        ],
+        'ユーザー' => [
+            ['label' => '社員マスタ', 'url' => '/staff_master/', 'color' => '#f5b7b1'],
+            ['label' => 'ユーザー管理', 'url' => '/wp-admin/users.php', 'color' => '#d5dbdb'],
+        ],
+        'ログ' => [
+            ['label' => 'ログ参照', 'url' => '/log_display/', 'color' => '#f2f3f4'],
+        ],
     ];
 
     ob_start();
@@ -255,15 +278,24 @@ function custom_link_buttons_shortcode() {
             text-align: center;
             font-size: 1.5em;
             font-weight: bold;
-            color: #fff; /* 白文字に変更 */
+            color: #fff;
             margin-bottom: 24px;
+        }
+
+        .category-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 24px 0 12px;
+            padding-left: 4px;
+            border-left: 6px solid #ccc;
+            color: #444;
         }
 
         .custom-button-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 16px;
-            margin: 0 0 20px 0;
+            margin-bottom: 20px;
         }
 
         @media (min-width: 768px) {
@@ -292,13 +324,19 @@ function custom_link_buttons_shortcode() {
 
     <div class="custom-header">社内システムTOP</div>
 
-    <div class="custom-button-grid">
-        <?php foreach ($buttons as $btn): ?>
-            <a href="<?php echo esc_url($btn['url']); ?>" target="_blank" style="background-color: <?php echo esc_attr($btn['color']); ?>;">
-                <?php echo esc_html($btn['label']); ?>
-            </a>
-        <?php endforeach; ?>
-    </div>
+    <?php foreach ($categories as $category => $buttons): ?>
+        <div class="category-title"><?php echo esc_html($category); ?></div>
+
+        <div class="custom-button-grid">
+            <?php foreach ($buttons as $btn): ?>
+                <a href="<?php echo esc_url($btn['url']); ?>" target="_blank"
+                   style="background-color: <?php echo esc_attr($btn['color']); ?>;">
+                    <?php echo esc_html($btn['label']); ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    <?php endforeach; ?>
+
     <?php
     return ob_get_clean();
 }

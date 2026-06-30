@@ -1,0 +1,765 @@
+/* shinwa/leave_style.css */
+
+.swl-container {
+  max-width: 960px;
+  margin: 40px auto;
+  padding: 0 16px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.swl-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  padding: 24px 24px 32px;
+}
+
+.swl-title {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  border-left: 4px solid #3b82f6;
+  padding-left: 10px;
+}
+
+.swl-field {
+  margin-bottom: 16px;
+}
+
+.swl-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+.swl-field > div {
+  color: #111827;
+}
+
+.swl-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.swl-inline > div {
+  flex: 1 1 30%;
+}
+
+.swl-radio-group label {
+  margin-right: 16px;
+  font-weight: 400;
+}
+
+.swl-date-range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swl-date-range input[type="date"],
+.swl-days-input,
+.swl-table input,
+.swl-table select,
+.swl-table textarea,
+.swl-card input[type="text"],
+.swl-card textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.9rem;
+}
+
+.swl-days-input {
+  width: 60px;
+  text-align: right;
+}
+
+.swl-card textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.swl-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.swl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.swl-btn:hover {
+  background: #d1d5db;
+}
+
+.swl-btn-primary {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.swl-btn-primary:hover {
+  background: #2563eb;
+}
+
+.swl-btn-secondary {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.swl-btn-secondary:hover {
+  background: #059669;
+}
+
+.swl-btn-small {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
+.swl-alert {
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.swl-alert-error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.swl-alert-success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* テーブル */
+.swl-table-wrapper {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.swl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.swl-table th,
+.swl-table td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px 6px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.swl-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* スマホ表示（768px以下） */
+@media (max-width: 768px) {
+
+  .swl-table-wrapper {
+    overflow-x: visible; /* カード型にするので横スクロール不要 */
+  }
+
+  .swl-table {
+    border: 0;
+  }
+
+  .swl-table thead {
+    display: none;
+  }
+
+  .swl-table tr {
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    background: #fff;
+  }
+
+  .swl-table td {
+    display: flex;               /* ← ラベルと値を横並びにする */
+    padding: 6px 0;
+    border: none;
+    font-size: 0.9rem;
+    word-break: break-word;      /* ← 長文でも折り返す */
+  }
+
+  .swl-table td::before {
+    content: attr(data-label);
+    flex: 0 0 90px;              /* ← ラベル幅を固定 */
+    font-weight: bold;
+    color: #444;
+    padding-right: 8px;
+    white-space: nowrap;
+  }
+}
+
+/* ページネーション */
+.swl-pagination {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.swl-page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  font-size: 0.8rem;
+  text-decoration: none;
+  color: #374151;
+  padding: 0 8px;
+}
+
+.swl-page-link:hover {
+  background: #e5e7eb;
+}
+
+.swl-page-current {
+  background: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+
+.swl-page-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* レスポンシブ */
+@media (max-width: 640px) {
+  .swl-card {
+    padding: 16px;
+  }
+  .swl-inline {
+    flex-direction: column;
+  }
+  .swl-actions {
+    justify-content: flex-start;
+  }
+}
+
+/* ラジオボタン・チェックボックスのフォーカス枠を消す */
+input[type="radio"],
+input[type="checkbox"] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* キーボード操作時のフォーカスも消す場合 */
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ラジオボタン・チェックボックスの左右を逆にする */
+.swl-radio-group label,
+.swl-checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-direction: row-reverse; /* ← これで左右が逆になる */
+}
+
+/* ラジオボタン・チェックボックスのサイズ調整 */
+.swl-radio-group input[type="radio"],
+.swl-checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* スマホでラベルが改行されないようにする */
+.swl-radio-group label,
+.swl-checkbox-group label {
+  white-space: nowrap; /* ← これで1行に収まる */
+}
+
+/* ラジオボタン・チェックボックスのフォーカス枠を消す */
+.swl-radio-group input[type="radio"],
+.swl-checkbox-group input[type="checkbox"] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ラジオボタン・チェックボックスの左右を逆にする（強制版） */
+.swl-radio-group label,
+.swl-checkbox-group label {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-direction: row-reverse !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+}
+
+/* ラジオボタン・チェックボックスのサイズ調整（強制版） */
+.swl-radio-group input[type="radio"],
+.swl-checkbox-group input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* スマホでも左右逆・1行を維持する（Lightning のレスポンシブを上書き） */
+@media (max-width: 768px) {
+  .swl-radio-group label,
+  .swl-checkbox-group label {
+    display: inline-flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+  }
+
+  .swl-radio-group input[type="radio"],
+  .swl-checkbox-group input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+    flex-shrink: 0 !important;
+  }
+}
+
+/* Lightning のスマホCSSを完全に上書きする最強版 */
+@media (max-width: 768px) {
+
+  /* ラジオ・チェックのラベルを強制的に横並び＆左右逆にする */
+  .swl-radio-group label,
+  .swl-checkbox-group label {
+    display: inline-flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+    width: auto !important;
+    max-width: 100% !important;
+  }
+
+  /* ラジオ・チェックのサイズを固定 */
+  .swl-radio-group input[type="radio"],
+  .swl-checkbox-group input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Lightning が label を block にするのを完全に無効化 */
+  .swl-radio-group label,
+  .swl-checkbox-group label {
+    display: inline-flex !important;
+  }
+}
+
+/* Lightning のスマホ判定（device-mobile）も完全に上書きする最強版 */
+body.device-mobile .swl-radio-group label,
+body.device-mobile .swl-checkbox-group label {
+  display: inline-flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+  width: auto !important;
+}
+
+body.device-mobile .swl-radio-group input[type="radio"],
+body.device-mobile .swl-checkbox-group input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+body.sp .swl-radio-group label,
+body.mobile .swl-radio-group label,
+body.sp .swl-checkbox-group label,
+body.mobile .swl-checkbox-group label {
+  display: inline-flex !important;
+  flex-direction: row-reverse !important;
+  white-space: nowrap !important;
+}
+
+/* Lightning のスマホCSSを完全に上書きする最終版 */
+@media (max-width: 768px) {
+
+  form .swl-radio-group label,
+  form .swl-checkbox-group label {
+    display: inline-flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+    width: auto !important;
+    max-width: 100% !important;
+  }
+
+  form .swl-radio-group input[type="radio"],
+  form .swl-checkbox-group input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+}
+
+/* Safari の label-flex バグを回避する */
+.swl-radio-group label,
+.swl-checkbox-group label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+}
+
+/* input を label の外側に見せる */
+.swl-radio-group label input,
+.swl-checkbox-group label input {
+  order: 2 !important; /* ← Safari でも確実に右側へ移動 */
+}
+
+.swl-radio-group label span,
+.swl-checkbox-group label span {
+  order: 1 !important;
+}
+
+/* Safari のチェックボックス位置ズレ対策 */
+.swl-checkbox-group label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+}
+
+.swl-checkbox-group input[type="checkbox"] {
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: middle !important;
+  position: relative !important;
+  top: -2px !important; /* ← Safari のズレを補正する */
+}
+
+.swl-checkbox-group {
+  display: flex;
+  gap: 16px;
+}
+
+.swl-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.swl-checkbox-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+/* PC表示では左寄せに戻す */
+@media (min-width: 769px) {
+  .swl-radio-group {
+    display: flex;
+    justify-content: flex-start; /* ← 左寄せ */
+    gap: 20px; /* 適度な余白 */
+  }
+
+  .swl-radio-group label {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    flex-direction: row-reverse; /* ← 左右逆は維持 */
+    white-space: nowrap;
+  }
+}
+
+.swl-approve-status {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f7f7f7;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.swl-approve-status div {
+  margin-bottom: 8px;
+}
+
+.swl-approve-status label {
+  font-weight: bold;
+  width: 120px;
+  display: inline-block;
+}
+
+/* 事由以外は改行禁止 */
+.swl-table td {
+  white-space: nowrap;
+}
+
+/* 事由（6列目）だけは改行コードを反映する */
+.swl-table td:nth-child(6) {
+  white-space: pre-line; /* ← これが最適 */
+  word-break: break-word; /* 長い単語だけ折り返す */
+  max-width: 400px; /* 必要なら調整 */
+}
+
+/* PC のときは横幅を広げる */
+@media (min-width: 1024px) {
+  .swl-container {
+    max-width: 1400px; /* ← 1.5倍くらいに広げる */
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .swl-table,
+  .swl-table thead,
+  .swl-table tbody,
+  .swl-table th,
+  .swl-table td,
+  .swl-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .swl-table thead {
+    display: none;
+  }
+
+  .swl-table td {
+    white-space: normal;
+    display: block;
+    padding: 4px 0;
+  }
+}
+
+.swl-status-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  min-width: 60px; /* ← 幅を揃えるためのポイント */
+  text-align: center;
+}
+
+/* 承認済（青 or 緑） */
+.swl-status-approved {
+  color: #0a7dda;
+  background: #e6f4ff;
+}
+
+/* 未承認（グレー） */
+.swl-status-pending {
+  color: #666;
+  background: #f0f0f0;
+}
+
+/* スマホで日付入力欄を大きく・押せるように見せる */
+@media (max-width: 768px) {
+
+  .swl-date-range {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 6px;
+    align-items: center;
+  }
+
+  /* 日付入力欄をボタン風に */
+  .swl-date-range input[type="date"] {
+    flex: 1 1 140px;
+    padding: 14px 12px 14px 40px;
+    font-size: 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23666" viewBox="0 0 24 24"><path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7zm13 8H4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10z"/></svg>') no-repeat 10px center;
+    background-size: 22px;
+    box-sizing: border-box;
+  }
+
+  .swl-date-range input[type="date"]:focus {
+    border-color: #3b82f6;
+    background-color: #f0f7ff;
+  }
+
+  /* 「から」「まで」「日間」などの文字を小さく整える */
+  .swl-date-range span {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0 4px;
+  }
+
+  /* 日数欄もスマホで見やすく */
+  .swl-days-input {
+    width: 80px;
+    padding: 12px 8px;
+    font-size: 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    background: #f9fafb;
+    text-align: center;
+  }
+}
+
+/* 事由の改行をそのまま表示する */
+.swl-table td[data-label="事由"] {
+  white-space: pre-wrap;
+}
+
+@media (max-width: 768px) {
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    input[type="email"],
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+.swl-table td.swl-half {
+  white-space: nowrap;
+}
+
+.swl-table td.swl-center {
+  text-align: center;
+}
+
+/* スマホ表示（幅600px以下） */
+@media (max-width: 600px) {
+
+  .swl-table thead {
+    display: none;
+  }
+
+  .swl-table,
+  .swl-table tbody,
+  .swl-table tr,
+  .swl-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .swl-table tr {
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    padding: 8px;
+    background: #fff;
+  }
+
+  .swl-table td {
+    position: relative;
+    padding-left: 90px; /* ← ラベル幅 + 余白（80px + 10px） */
+    text-align: left !important;
+    border-bottom: 1px solid #eee;
+    word-break: break-word;
+  }
+
+  .swl-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 8px;
+    top: 6px;
+    width: 80px;        /* ← ★ ラベル幅を狭くする */
+    font-weight: bold;
+    color: #555;
+    white-space: nowrap;
+  }
+
+  .swl-table td:last-child {
+    border-bottom: none;
+  }
+
+  /* ★ 申請IDだけ左寄せ */
+  .swl-table td[data-label="申請ID"] {
+    text-align: left !important;
+  }
+}
+
+.swl-pagination {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.swl-page-btn,
+.swl-pagination .current {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 0 3px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+}
+
+.swl-pagination .current {
+    background: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+/* ページング全体 */
+.swl-pagination {
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* ページ番号ボタン（通常） */
+.swl-pagination a,
+.swl-pagination span {
+    display: inline-block;
+    min-width: 32px;
+    padding: 6px 10px;
+    margin: 0 3px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.4;
+    vertical-align: middle; /* ← ズレ防止 */
+}
+
+/* 現在ページ */
+.swl-pagination .current {
+    background: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+    font-weight: bold;
+}
+
+/* マウスオーバー（通常ページのみ） */
+.swl-pagination a:hover {
+    background: #e6f2fa;
+    border-color: #0073aa;
+    color: #0073aa;
+}
+

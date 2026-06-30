@@ -1,0 +1,8 @@
+body.swl-test-env::before {
+    content: "TEST ENVIRONMENT";
+    background: #d9534f;
+    color: #fff;
+    padding: 10px;
+    display: block;
+    text-align: center;
+}

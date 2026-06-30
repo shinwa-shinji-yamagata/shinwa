@@ -196,3 +196,20 @@ adjust_month_columns($sheetsService, $newFileId, $daysInMonth);
 for ($i = $daysInMonth + 1; $i <= 31; $i++) {
     delete_sheet_by_name($sheetsService, $newFileId, "{$i}日");
 }
+
+$spreadsheetUrl = "https://docs.google.com/spreadsheets/d/{$newFileId}/edit";
+
+$message  = "{$newYear}年{$newMonth}月の日毎表を作成しました。\r\n\r\n";
+$message .= "以下のURLにアクセスし、拡張機能の「Apps Script」からトリガーを追加してください。\r\n\r\n";
+$message .= "{$spreadsheetUrl}\r\n\r\n";
+
+$admins = get_users([ 'role' => 'administrator' ]);
+
+foreach ($admins as $admin) {
+    wp_mail(
+        $admin->user_email,
+        "日毎表作成通知：{$newYear}年{$newMonth}月",
+        $message
+    );
+}
+

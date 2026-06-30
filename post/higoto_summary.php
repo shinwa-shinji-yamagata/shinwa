@@ -60,8 +60,10 @@ for ($day = 1; $day <= 31; $day++) {
         $rows = $response->getValues();
         if (is_array($rows)) {
             foreach ($rows as $row) {
+                // C〜N列は 12 列あるので、足りない分を埋める
+                $row = array_pad($row, 12, '');
                 // 現場名が空ならスキップ
-                if (!isset($row[0])) {
+                if (!isset($row[0]) || trim($row[0]) === '') {
                     continue;
                 }
                 // C列：現場名（index 0）
@@ -91,7 +93,10 @@ for ($day = 1; $day <= 31; $day++) {
                 }
                 $siteData[$key]['manpower'] += $manpower;
                 $siteData[$key]['outsourcing'] += $outsourcingCount;
-                $siteData[$key]['days'][$day] = true; // ← この日にデータがあったことを記録
+                $siteData[$key]['days'][$day] = '〇';
+                if( $manpower == 0 && $outsourcingCount > 0 ) {
+                    $siteData[$key]['days'][$day] = '外';
+                }
             }
         }
     } catch (Exception $e) {
@@ -171,7 +176,7 @@ foreach ($siteData as $key => $data) {
 
     $row = [];
     for ($d = 1; $d <= 31; $d++) {
-        $row[] = isset($days[$d]) ? '〇' : '';
+        $row[] = isset($days[$d]) ? $days[$d] : '';
     }
     $circleData[] = $row;
 }
