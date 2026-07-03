@@ -65,6 +65,7 @@ $monthFolderId = getOrCreateFolder($driveService, $yearFolderId, $monthFolderNam
 // 3. テンプレートを6人分の名前でコピーする
 // ------------------------------------------------------------
 $templateId = "1_ik3abvuk2_myuvFAA7sv5zwN8Pqt5jFxvqfkYa6vAM";
+$templateIdTokita = "1ImGPjoZy2zeNWtg5EK2JgSncdy7K47bt5bkVz8-4RYM";
 
 $targetNames = ["門脇", "時田", "黒田", "栗原", "栗山", "稲垣"];
 
@@ -88,7 +89,11 @@ foreach ($targetNames as $name) {
         'parents' => [$monthFolderId]
     ]);
 
-    $copied = $driveService->files->copy($templateId, $copyMeta, ['fields' => 'id']);
+    if( $name != "時田" ) {
+        $copied = $driveService->files->copy($templateId, $copyMeta, ['fields' => 'id']);
+    } else {
+        $copied = $driveService->files->copy($templateIdTokita, $copyMeta, ['fields' => 'id']);
+    }
     $newFileId = $copied->id;
 
     // --- 個別権限を付与（継承された権限は削除しない） ---
