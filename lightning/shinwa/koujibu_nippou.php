@@ -200,7 +200,10 @@ if (!$year) {
 if ($year && !$month) {
     // ② 年月の選択
     $months = $wpdb->get_col($wpdb->prepare("
-        SELECT DISTINCT month FROM $table WHERE year = %s ORDER BY month DESC
+        SELECT DISTINCT month
+        FROM $table
+        WHERE year = %s
+        ORDER BY STR_TO_DATE(month, '%Y年%c月') DESC
     ", $year));
     echo "<div class='month-grid'>";
     foreach ($months as $m) {
