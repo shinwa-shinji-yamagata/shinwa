@@ -202,7 +202,7 @@ function swl_calc_days_business($start_date, $end_date, $department, $is_half) {
 
     if ($e < $s) return 0;
 
-    // 工事部は土日祝を含める
+    // 工事部は土日を含める
     $include_weekends = ($department === '工事部');
 
     $holidays = swl_get_holidays();
@@ -216,8 +216,10 @@ function swl_calc_days_business($start_date, $end_date, $department, $is_half) {
         $d = $current->format('Y-m-d');
 
         if ($include_weekends) {
-            // 設計部 → 全日カウント
-            $days++;
+            // 工事部 → 土日カウント
+            if ( !in_array($d, $holidays, true) ) {
+                $days++;
+            }
         } else {
             // 土日祝を除外
             if ($w !== 0 && $w !== 6 && !in_array($d, $holidays, true)) {

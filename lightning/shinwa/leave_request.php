@@ -294,7 +294,7 @@ $deny_positions = ['社長', '会長', '副社長'];
 $deny_by_position = in_array($position, $deny_positions, true);
 
 // ② 申請を許可する部署（今は管理部だけ）
-$allowed_departments = ['管理部'];
+$allowed_departments = ['管理部', '工事部'];
 // 設計部を追加する時はこのようにする
 // $allowed_departments = ['管理部', '設計部'];
 

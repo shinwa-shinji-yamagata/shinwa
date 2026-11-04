@@ -70,12 +70,33 @@ $templateIdTokita = "1ImGPjoZy2zeNWtg5EK2JgSncdy7K47bt5bkVz8-4RYM";
 $targetNames = ["門脇", "時田", "黒田", "栗原", "栗山", "稲垣"];
 
 $permissionMap = [
-    "門脇" => ["shinwa.h.kadowaki@gmail.com", "shinwa1.soumu@gmail.com", "shinwa.h.kurihara@gmail.com"],
-    "時田" => ["shinwa.s.tokita@gmail.com", "shinwa1.soumu@gmail.com", "shinwa.h.kurihara@gmail.com"],
-    "黒田" => ["shinwa1.soumu@gmail.com", "shinwa.h.kurihara@gmail.com"],
-    "栗原" => ["shinwa.h.kurihara@gmail.com", "shinwa1.soumu@gmail.com", "shinwa.h.kurihara@gmail.com"],
-    "栗山" => ["keirishinwa1@gmail.com", "shinwa1.soumu@gmail.com", "shinwa.h.kurihara@gmail.com"],
-    "稲垣" => ["shinwa.t.inagaki@gmail.com", "shinwa1.soumu@gmail.com", "shinwa.h.kurihara@gmail.com"],
+    // 管理部
+    "黒田" => [
+        "owner" => "shinwa1.soumu@gmail.com",   // 黒田（編集者）
+        "manager" => null                       // 管理者なし
+    ],
+    "栗山" => [
+        "owner" => "keirishinwa1@gmail.com",    // 栗山（編集者）
+        "manager" => "shinwa1.soumu@gmail.com"  // 黒田（閲覧者）
+    ],
+    "稲垣" => [
+        "owner" => "shinwa.t.inagaki@gmail.com", // 稲垣（編集者）
+        "manager" => "shinwa1.soumu@gmail.com"   // 黒田（閲覧者）
+    ],
+
+    // 工事部
+    "栗原" => [
+        "owner" => "shinwa.h.kurihara@gmail.com", // 栗原（編集者）
+        "manager" => null                          // 管理者なし
+    ],
+    "時田" => [
+        "owner" => "shinwa.s.tokita@gmail.com",    // 時田（編集者）
+        "manager" => "shinwa.h.kurihara@gmail.com" // 栗原（閲覧者）
+    ],
+    "門脇" => [
+        "owner" => "shinwa.h.kadowaki@gmail.com",  // 門脇（編集者）
+        "manager" => "shinwa.h.kurihara@gmail.com" // 栗原（閲覧者）
+    ],
 ];
 
 // ------------------------------------------------------------
@@ -96,15 +117,13 @@ foreach ($targetNames as $name) {
     }
     $newFileId = $copied->id;
 
-    // --- 個別権限を付与（継承された権限は削除しない） ---
+    // --- 個別権限を付与 ---
     if (!isset($permissionMap[$name])) {
         error_log("ERROR: permissionMap にキーがありません → " . $name);
     } else {
 
-        $allowedUsers = $permissionMap[$name];
-
-        // 本人（先頭）
-        $ownerEmail = array_shift($allowedUsers);
+        $ownerEmail   = $permissionMap[$name]["owner"];
+        $managerEmail = $permissionMap[$name]["manager"];
 
         // 本人 → writer
         try {
@@ -118,17 +137,17 @@ foreach ($targetNames as $name) {
             error_log("OWNER PERMISSION ERROR: " . $e->getMessage());
         }
 
-        // その他 → reader
-        foreach ($allowedUsers as $email) {
+        // 管理者 → reader（存在する場合のみ）
+        if (!empty($managerEmail)) {
             try {
-                $newPerm = new Google_Service_Drive_Permission([
+                $managerPerm = new Google_Service_Drive_Permission([
                     'type' => 'user',
                     'role' => 'reader',
-                    'emailAddress' => $email
+                    'emailAddress' => $managerEmail
                 ]);
-                $driveService->permissions->create($newFileId, $newPerm, ['sendNotificationEmail' => false]);
+                $driveService->permissions->create($newFileId, $managerPerm, ['sendNotificationEmail' => false]);
             } catch (Exception $e) {
-                error_log("READER PERMISSION ERROR: " . $e->getMessage());
+                error_log("MANAGER PERMISSION ERROR: " . $e->getMessage());
             }
         }
     }

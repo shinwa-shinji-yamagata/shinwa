@@ -211,7 +211,7 @@ if ($year && !$month) {
 }
 
 // ③ 名前の選択
-$order = ["黒田","稲垣","栗山","栗原","時田","門脇"];
+$order = ["黒田","稲垣","栗山"];
 
 $rows = $wpdb->get_results($wpdb->prepare("
     SELECT name, url FROM $table WHERE year = %s AND month = %s
@@ -223,15 +223,12 @@ foreach ($rows as $r) {
 }
 
 // ③ 名前の選択
-$order = ["黒田","稲垣","栗山","栗原","時田","門脇"];
+$order = ["黒田","稲垣","栗山"];
 
 $classMap = [
     "黒田" => "btn-kuroda",
     "稲垣" => "btn-inagaki",
     "栗山" => "btn-kuriyama",
-    "栗原" => "btn-kurihara",
-    "時田" => "btn-tokita",
-    "門脇" => "btn-kadowaki",
 ];
 
 echo "<div class='name-grid'>";

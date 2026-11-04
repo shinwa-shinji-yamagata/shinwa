@@ -250,22 +250,20 @@ function custom_link_buttons_shortcode() {
         ],
         '管理業務' => [
             ['label' => '管理部作業日報', 'url' => '/kanribu_nippou/', 'color' => '#fae5d3'],
-            ['label' => '休暇申請', 'url' => '/leave-request/', 'color' => '#eaf7d5'],
+            ['label' => '工事事務作業日報', 'url' => '/koujibu_nippou/', 'color' => '#eaf7d5'],
+            ['label' => '休暇申請', 'url' => '/leave-request/', 'color' => '#e8f8f5'],
         ],
         'マスタ' => [
             ['label' => '業者マスタ', 'url' => '/gyousya_master/', 'color' => '#f9ebea'],
             ['label' => '現場マスタ', 'url' => '/genba_master/', 'color' => '#d1f2eb'],
         ],
         'その他' => [
-            ['label' => '注文書', 'url' => 'https://drive.google.com/drive/folders/1hQR_l1-4xlnxazHy5GHJlRHxBz96i-m0', 'color' => '#e8daef'],
             ['label' => '新和なんでもAIボット', 'url' => '/shinwabot/', 'color' => '#fef5e7'],
+            ['label' => 'ログ参照', 'url' => '/log_display/', 'color' => '#f2f3f4'],
         ],
         'ユーザー' => [
             ['label' => '社員マスタ', 'url' => '/staff_master/', 'color' => '#f5b7b1'],
             ['label' => 'ユーザー管理', 'url' => '/wp-admin/users.php', 'color' => '#d5dbdb'],
-        ],
-        'ログ' => [
-            ['label' => 'ログ参照', 'url' => '/log_display/', 'color' => '#f2f3f4'],
         ],
     ];
 
